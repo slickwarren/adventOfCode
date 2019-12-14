@@ -45,14 +45,14 @@ int CalcFuel::runProgram(int arr[], int n, int v, int input ){
   int current_operator = arr[i];
   while(arr[i] != 99) {
     if (current_operator > 10){
-      std::cout << " i: " << i << " O " << current_operator << " -> M: " << bigMode << std::endl;
+      //std::cout << " i: " << i << " O " << current_operator << " -> M: " << bigMode << std::endl;
       bigMode=current_operator / 100;
       current_operator=current_operator % 100;
     }
     else{
       bigMode=0;
     }
-    std::cout << " i: " << i << " O " << current_operator << " -> M: " << bigMode  << " arr[i+1] " << arr[1] << std::endl;
+    //std::cout << " i: " << i << " O " << current_operator << " -> M: " << bigMode  << " arr[i+1] " << arr[1] << std::endl;
 
     v1 = (bigMode % 10 > 0) ? i+1 : arr[i+1];
     v2 = (bigMode/10 % 10 > 0) ? i+2 : arr[i+2];
@@ -75,7 +75,8 @@ int CalcFuel::runProgram(int arr[], int n, int v, int input ){
         break;
       case (4):
         if (arr[v1] !=0 && arr[i+2] != 99){
-          return -1;
+          std::cout << "incorrect write: code " << arr[v1] << std::endl;
+          //return -1;
         }
         else if (arr[i+2] == 99){
           return arr[v1];
@@ -87,15 +88,15 @@ int CalcFuel::runProgram(int arr[], int n, int v, int input ){
           i=arr[v2];
         }
         else {
-          i+=2;
+          i+=3;
         }
         break;
       case (6):
-        if (v1 == 0) {
+        if (arr[v1] == 0) {
           i=arr[v2];
         }
         else {
-          i+=2;
+          i+=3;
         }
         break;
       case (7):
@@ -117,10 +118,11 @@ int CalcFuel::runProgram(int arr[], int n, int v, int input ){
         i+=4;
         break;
       default:
+        std::cout << "wrong operator" << std::endl;
         return -1;
     }
     current_operator=arr[i];
-    std::cout << " x: " << bigMode % 10 << " y: " << (bigMode / 10) % 10  << " z: " << current_operator << std::endl;
+    //std::cout << " x: " << bigMode % 10 << " y: " << (bigMode / 10) % 10  << " z: " << current_operator << std::endl;
 
   }
   return arr[0];
