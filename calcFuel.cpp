@@ -6,6 +6,12 @@
 #include <iostream>
 #include <cmath>
 
+/*Calculates total fuel needed based on mass of items.
+Args:
+    name - char pointer to the name of the file containing masses of items.
+Return: int
+    total mass
+*/
 int CalcFuel::totalFuel(const char *name) {
   std::ifstream inputFile;
   int total = 0;
@@ -27,6 +33,18 @@ int CalcFuel::totalFuel(const char *name) {
   return total;
 }
 
+/* Takes an array of ints representing a series of commands.
+Args:
+    arr[] - int array of commands and parameters.  Always starts with an
+            mode+operator.
+    n - noun -> replace arr[1] with noun (day 2)
+    v - verb -> replace arr[2] with verb (day 2)
+    input - value that will be read on operator code 3 (day 5)
+Return: int
+    -1 on error
+    if the last command was 4 (write to user), output will be that value (day 5)
+    otherwise, output is arr[0] (day 2)
+*/
 int CalcFuel::runProgram(int arr[], int n, int v, int input ){
   int i = 0;
   if (n>-1) {
@@ -52,27 +70,28 @@ int CalcFuel::runProgram(int arr[], int n, int v, int input ){
     else{
       bigMode=0;
     }
-    //std::cout << " i: " << i << " O " << current_operator << " -> M: " << bigMode  << " arr[i+1] " << arr[1] << std::endl;
-
     v1 = (bigMode % 10 > 0) ? i+1 : arr[i+1];
     v2 = (bigMode/10 % 10 > 0) ? i+2 : arr[i+2];
     v3 = ((bigMode/100) % 10 > 0) ? i+3 : arr[i+3];
-    //old code should still work
     switch (current_operator) {
+      //add next 2 arguments, store at v3
       case (1):
         value = arr[v1] + arr[v2];
         arr[v3]=value;
         i+=4;
         break;
+      //multiply next 2 arguments, store at v3
       case (2):
         value = arr[v1] * arr[v2];
         arr[v3]=value;
         i+=4;
         break;
+      //store input at v1
       case (3):
         arr[v1]=input;
         i+=2;
         break;
+      //write v1 to output.  If at end of commands, stop test
       case (4):
         if (arr[v1] !=0 && arr[i+2] != 99){
           std::cout << "incorrect write: code " << arr[v1] << std::endl;
@@ -83,6 +102,7 @@ int CalcFuel::runProgram(int arr[], int n, int v, int input ){
         }
         i+=2;
         break;
+      //jump to v2 if v1 is not 0
       case (5):
         if (arr[v1] != 0){
           i=arr[v2];
@@ -91,6 +111,7 @@ int CalcFuel::runProgram(int arr[], int n, int v, int input ){
           i+=3;
         }
         break;
+      //jump to v2 if v1 is 0
       case (6):
         if (arr[v1] == 0) {
           i=arr[v2];
@@ -99,6 +120,7 @@ int CalcFuel::runProgram(int arr[], int n, int v, int input ){
           i+=3;
         }
         break;
+      //if v1 < v2, v3=1, otherwise v3=0
       case (7):
         if (arr[v1] < arr[v2]) {
           arr[v3] = 1;
@@ -108,6 +130,7 @@ int CalcFuel::runProgram(int arr[], int n, int v, int input ){
         }
         i+=4;
         break;
+      //if v1=v2, v3=1, otherwise v3=0
       case (8):
         if (arr[v1] == arr[v2]){
           arr[v3] = 1;
@@ -117,18 +140,22 @@ int CalcFuel::runProgram(int arr[], int n, int v, int input ){
         }
         i+=4;
         break;
+      //we reached an operator that is not above (should not happen)
       default:
         std::cout << "wrong operator" << std::endl;
         return -1;
     }
     current_operator=arr[i];
-    //std::cout << " x: " << bigMode % 10 << " y: " << (bigMode / 10) % 10  << " z: " << current_operator << std::endl;
-
   }
+  //for day 2's challenge, return first argument of original array
   return arr[0];
 }
 
-
+/*Finds noun and verb for runProgram based on what you want the final var to be.
+Args:
+    pair - pointer to a pair of values, {n, v}
+    finalVar - desired final variable (an output from runProgram)
+*/
 void CalcFuel::findProgram(int* pair, int finalVar){
   finalVar -= 106644;
   if (finalVar >0){
@@ -141,6 +168,14 @@ void CalcFuel::findProgram(int* pair, int finalVar){
   }
 }
 
+
+/*WIP - day 3 - Calculates closest intersection of wire to origin.
+Args:
+    lines - a pointer to a double int array. should have 2 lines with many
+            coordinates, representing some 90` shift in said wire
+Return: int
+    Manhattan Distance to closest intersection of wires.
+*/
 int CalcFuel::mapWires(int** lines){
   int l=9;
   int shortest = 200000000;
@@ -220,6 +255,12 @@ int CalcFuel::mapWires(int** lines){
   return shortest;
 }
 
+/*WIP - Day 3 - maps custom coordinates to cartesian coordinates for wires on a grid.
+Args:
+    filename - name of file containing wires. Each new line is a new wire
+Return: int
+    manhattan distance to closest intersection of wires.
+*/
 int CalcFuel::closestIntersection(const char* filename){
   std::ifstream inputFile;
   int linex1[30000]={};
@@ -328,6 +369,12 @@ int CalcFuel::closestIntersection(const char* filename){
   return mapWires(all_lines);
 }
 
+/* WIP -Day 4 part 2 - Determines if an input is a valid command.
+Args:
+    number - 6 digit long number to be evaluated
+Return: int
+    1 if number is valid, 0 otherwise
+*/
 int CalcFuel::isValid(int number){
   int hasDouble=0;
   int lastNum=-1;
@@ -356,8 +403,3 @@ int CalcFuel::isValid(int number){
   if (hasDouble == 1) return 1;
   else return 0;
 }
-/*
-
-
-
-*/
