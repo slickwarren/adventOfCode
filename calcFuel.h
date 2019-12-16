@@ -15,7 +15,15 @@ public:
   int mapWires(int** allLines);
   int closestIntersection(const char *filename);
   int isValid(int num);
+  int totalPlanets(const char* planetFile);
 };
+/*
+struct LinkedList
+{
+  Node head;
+  Node next;
+};
+*/
 
 
 

@@ -5,7 +5,8 @@
 #include <array>
 #include <iostream>
 #include <cmath>
-
+#include <map>
+#include <list>
 /*Calculates total fuel needed based on mass of items.
 Args:
     name - char pointer to the name of the file containing masses of items.
@@ -402,4 +403,43 @@ int CalcFuel::isValid(int number){
   }
   if (hasDouble == 1) return 1;
   else return 0;
+}
+
+class pMap {
+public:
+  std::string planet;
+  pMap *lastPlanet;
+  int length;
+};
+
+int CalcFuel::totalPlanets(const char* planetFile){
+  std::ifstream f;
+  std::string firstPlanet;
+  std::string secondPlanet;
+  f.open(planetFile);
+
+
+  std::string line="abc)123";
+  pMap planetLink;
+  pMap* lplanet = NULL;
+  int i=0;
+
+  if (f.is_open()){
+    while(getline (f, line)){
+      if (i==0){
+        std::cout << "Here" << std::endl;
+        planetLink.planet=line.substr(0,3);
+        lplanet = &planetLink;
+        planetLink = pMap();
+        planetLink.planet=line.substr(4,3);
+        planetLink.length=1;
+      }
+
+      //planetLink.planet=(std::pair<std::string, std::list<std::string> >(nextp, connectingPlanet));
+      i++;
+    }
+  }
+  //}
+  std::cout << planetLink.length << std::endl;
+  return 0;
 }

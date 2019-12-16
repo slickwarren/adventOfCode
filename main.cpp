@@ -4,12 +4,14 @@
 
   int main(int argc, char *argv[]) {
   CalcFuel c;
+  //day 1
   //const char *name = "input.txt";
   //int total = c.totalFuel(name);
   if (argc!=3){
     std::cout << "a.out program#, argument" << std::endl;
     return -1;
   }
+  // day 2, 5
   if (std::atoi(argv[1]) == 1){
     int tinput[] = {3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
   1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
@@ -19,11 +21,13 @@
     std::cout << firstone << std::endl;
   }
 
+  //day 3
   // find manhattan distance of closest intersection of wires in lines.txt
 
   //int manh=c.closestIntersection("testInput.txt");
   //std::cout << manh << std::endl;
-
+  /*
+  //day 4
   int total=0;
   int current_val=c.isValid(789999);
   std::cout << current_val << std::endl;
@@ -37,6 +41,7 @@
   }
 
   std::cout << total << std::endl;
-
+  */
+  c.totalPlanets("planets.txt");
   return 0;
 }
