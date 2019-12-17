@@ -405,41 +405,86 @@ int CalcFuel::isValid(int number){
   else return 0;
 }
 
-class pMap {
+const int SIZE=100;
+
+class pMap
+{
+
 public:
-  std::string planet;
+  std::string planet[SIZE];
   pMap *lastPlanet;
-  int length;
+  int length=0; //length AKA size of array
+  int depth=0;  //depth of planets so far
 };
 
-int CalcFuel::totalPlanets(const char* planetFile){
+
+
+int CalcFuel::totalPlanets(const char* planetFile)
+{
   std::ifstream f;
-  std::string firstPlanet;
-  std::string secondPlanet;
+  std::string parentPlanet;
+  std::string currentPlanet;
   f.open(planetFile);
 
-
+  bool wasFound = false;
   std::string line="abc)123";
   pMap planetLink;
-  pMap* lplanet = NULL;
+  pMap* lPlanet = NULL;
   int i=0;
-
+  pMap lPlanet2;
   if (f.is_open()){
     while(getline (f, line)){
+      parentPlanet=line.substr(0,3);
+      currentPlanet=line.substr(4,3);
       if (i==0){
         std::cout << "Here" << std::endl;
-        planetLink.planet=line.substr(0,3);
-        lplanet = &planetLink;
+        planetLink.planet[0]=parentPlanet;
+        planetLink.length++;
+        lPlanet = &planetLink;
         planetLink = pMap();
-        planetLink.planet=line.substr(4,3);
-        planetLink.length=1;
+        planetLink.lastPlanet=lPlanet;
+        planetLink.planet[0]=currentPlanet;
+        planetLink.length++;
+        planetLink.depth++;
       }
-
+      //last planet added is current planet's parent
+      //note: iterator is type pMap due to compile issues with normal x[i] access
+      for (int j=0;j<planetLink.planet.length; j++){
+        if (planetLink.planet[j] == parentPlanet){
+          lPlanet=&planetLink;
+          planetLink = pMap();
+          planetLink.planet[0]=currentPlanet;
+          planetLink.lastPlanet=lPlanet;
+          planetLink.depth=lPlanet->depth+1;
+          lPlanet->length++;
+          wasFound=true;
+          break;
+        }
+      }
+      //find parent planet
+    if (!wasFound) {
+        while (lPlanet->depth > 0 && ! wasFound) {
+          for (int k=0; k<lPlanet->planet.length; k++){
+            if (lPlanet->planet[k] == parentPlanet){
+              //add currentPlanet to orbit this parent
+              lPlanet=lPlanet->planet[k];
+              lPlanet2 = pMap();
+              lPlanet2.planet.push_back(currentPlanet);
+              lPlanet2.lastPlanet=lPlanet;
+              lPlanet2.depth=lPlanet->depth+1;
+              wasFound = true;
+              break;
+            }
+          }
+          lPlanet=lPlanet->lastPlanet;
+        }
+    }
+    wasFound = false;
       //planetLink.planet=(std::pair<std::string, std::list<std::string> >(nextp, connectingPlanet));
       i++;
     }
   }
   //}
-  std::cout << planetLink.length << std::endl;
+  std::cout << planetLink.depth << std::endl;
   return 0;
 }
