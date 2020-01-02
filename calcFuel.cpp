@@ -405,18 +405,24 @@ int CalcFuel::isValid(int number){
   else return 0;
 }
 
-const int SIZE=100;
+const int SIZE=100000;
+
+class pNode
+{
+
+public:
+  std::string planet;
+  pNode *lastPlanet=NULL;
+  int length=0;
+};
 
 class pMap
 {
 
 public:
-  std::string planet[SIZE];
-  pMap *lastPlanet;
-  int length=0; //length AKA size of array
-  int depth=0;  //depth of planets so far
+  pNode planets[SIZE];
+  int tot=0;
 };
-
 
 
 int CalcFuel::totalPlanets(const char* planetFile)
@@ -429,62 +435,100 @@ int CalcFuel::totalPlanets(const char* planetFile)
   bool wasFound = false;
   std::string line="abc)123";
   pMap planetLink;
-  pMap* lPlanet = NULL;
   int i=0;
-  pMap lPlanet2;
+  pNode planetNode;
+  pNode comm;
   if (f.is_open()){
     while(getline (f, line)){
       parentPlanet=line.substr(0,3);
       currentPlanet=line.substr(4,3);
+      // std::cout << line << std::endl;
       if (i==0){
-        std::cout << "Here" << std::endl;
-        planetLink.planet[0]=parentPlanet;
-        planetLink.length++;
-        lPlanet = &planetLink;
-        planetLink = pMap();
-        planetLink.lastPlanet=lPlanet;
-        planetLink.planet[0]=currentPlanet;
-        planetLink.length++;
-        planetLink.depth++;
+        planetNode=pNode();
+        comm.planet=parentPlanet;
+        planetNode.planet=currentPlanet;
+        planetNode.length+=1;
+        planetNode.lastPlanet= &comm;
+        planetLink.planets[i]=planetNode;
+        planetLink.tot++;
       }
-      //last planet added is current planet's parent
-      //note: iterator is type pMap due to compile issues with normal x[i] access
-      for (int j=0;j<planetLink.planet.length; j++){
-        if (planetLink.planet[j] == parentPlanet){
-          lPlanet=&planetLink;
-          planetLink = pMap();
-          planetLink.planet[0]=currentPlanet;
-          planetLink.lastPlanet=lPlanet;
-          planetLink.depth=lPlanet->depth+1;
-          lPlanet->length++;
+      for (int j=0; j<planetLink.tot; j++){
+        if (j==0 && comm.planet==parentPlanet){
+          planetNode=pNode();
+          planetNode.planet=currentPlanet;
+          planetLink.planets[planetLink.tot]=planetNode;
+          planetLink.tot++;
           wasFound=true;
           break;
         }
-      }
-      //find parent planet
-    if (!wasFound) {
-        while (lPlanet->depth > 0 && ! wasFound) {
-          for (int k=0; k<lPlanet->planet.length; k++){
-            if (lPlanet->planet[k] == parentPlanet){
-              //add currentPlanet to orbit this parent
-              lPlanet=lPlanet->planet[k];
-              lPlanet2 = pMap();
-              lPlanet2.planet.push_back(currentPlanet);
-              lPlanet2.lastPlanet=lPlanet;
-              lPlanet2.depth=lPlanet->depth+1;
-              wasFound = true;
-              break;
-            }
-          }
-          lPlanet=lPlanet->lastPlanet;
+        if (planetLink.planets[j].planet == parentPlanet){
+          planetNode=pNode();
+          planetNode.planet=currentPlanet;
+          planetNode.length = planetLink.planets[j].length+1;
+          std::cout << planetLink.planets[j].planet << std::endl;
+          planetNode.lastPlanet= &planetLink.planets[j];
+          planetLink.planets[planetLink.tot]= planetNode;
+
+          planetLink.tot++;
+          wasFound = true;
+          break;
         }
-    }
+      }
+      if (!wasFound){
+        planetNode=pNode();
+        comm=pNode();
+        comm.planet=parentPlanet;
+        planetNode.planet=currentPlanet;
+        planetNode.length+=1;
+        planetNode.lastPlanet= &comm;
+        planetLink.planets[planetLink.tot]=planetNode;
+        planetLink.tot++;
+        wasFound=true;
+      }
+
+    //   }
+    //   //last planet added is current planet's parent
+    //   //note: iterator is type pMap due to compile issues with normal x[i] access
+    //   for (int j=0;j<SIZE; j++){
+    //     if (planetLink.planet[j] == parentPlanet){
+    //       lPlanet=&planetLink;
+    //       planetLink = pMap();
+    //       planetLink.planet[0]=currentPlanet;
+    //       planetLink.lastPlanet=lPlanet;
+    //       planetLink.depth=lPlanet->depth+1;
+    //       lPlanet->length++;
+    //       wasFound=true;
+    //       break;
+    //     }
+    //   }
+    //   //find parent planet
+    // if (!wasFound) {
+    //     while (lPlanet->depth > 0 && ! wasFound) {
+    //       for (int k=0; k<SIZE; k++){
+    //         if (lPlanet->planet[k] == parentPlanet){
+    //           //add currentPlanet to orbit this parent
+    //           lPlanet=lPlanet->planet[k];
+    //           lPlanet2 = pMap();
+    //           lPlanet2.planet.push_back(currentPlanet);
+    //           lPlanet2.lastPlanet=lPlanet;
+    //           lPlanet2.depth=lPlanet->depth+1;
+    //           wasFound = true;
+    //           break;
+    //         }
+    //       }
+    //       lPlanet=lPlanet->lastPlanet;
+    //     }
+    // }
     wasFound = false;
       //planetLink.planet=(std::pair<std::string, std::list<std::string> >(nextp, connectingPlanet));
       i++;
     }
   }
   //}
-  std::cout << planetLink.depth << std::endl;
+  int totalLinks = 0;
+  for (int k=0; k<planetLink.tot; k++){
+    totalLinks += planetLink.planets[k].length;
+  }
+  std::cout << totalLinks << std::endl;
   return 0;
 }
